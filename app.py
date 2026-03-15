@@ -148,6 +148,8 @@ def generate_integration_code(api_docs_url):
 
 Given API documentation, generate complete, secure, production-ready Python code for integrating with the API.
 
+CRITICAL: You MUST generate EXACTLY 5 files in the order specified below. Do not skip any files.
+
 Your code must include:
 1. API client class with proper structure and error handling
 2. OAuth 2.0 authentication implementation
@@ -159,27 +161,29 @@ Your code must include:
 8. Type hints and comprehensive docstrings
 9. Configuration management for API credentials
 
-Output format - Use EXACTLY this format with markers:
+Output format - Use EXACTLY this format with ALL 5 files:
 
 ### FILE: api_client.py
-[Complete API client code here]
+[Complete API client code with main client class, initialization, and core methods]
 ### END FILE
 
 ### FILE: auth.py
-[Complete authentication code here]
+[Complete OAuth 2.0 authentication code with token management]
 ### END FILE
 
 ### FILE: data_sync.py
-[Complete data retrieval code here]
+[Complete data retrieval code with functions to get users, usage data, and handle pagination]
 ### END FILE
 
 ### FILE: error_handler.py
-[Complete error handling code here]
+[Complete error handling code with retry logic, exponential backoff, and custom exceptions]
 ### END FILE
 
 ### FILE: config.py
-[Complete configuration code here]
+[Complete configuration management code for API credentials and settings]
 ### END FILE
+
+IMPORTANT: Generate ALL 5 files. Do not combine files. Each file should be separate and complete.
 
 Follow PEP 8 style guidelines strictly.
 Include security best practices (no hardcoded credentials, input validation, etc.).
@@ -265,8 +269,21 @@ def parse_generated_files(code_text):
         
         files[filename] = content
     
+    # Validate that we have all required files
+    required_files = ['api_client.py', 'auth.py', 'data_sync.py', 'error_handler.py', 'config.py']
+    
+    # If some files are missing, add placeholder notes
+    for required_file in required_files:
+        if required_file not in files:
+            files[required_file] = f"""# {required_file}
+# This file should contain production-ready code for {required_file.replace('.py', '').replace('_', ' ')}
+# Note: AI generation did not create this file - please regenerate or create manually
+
+# TODO: Implement {required_file.replace('.py', '')} functionality
+"""
+    
     # If no files parsed (AI didn't follow format), create a single file
-    if not files:
+    if len([f for f in files if len(files[f]) > 200]) == 0:
         files['integration_code.py'] = code_text
     
     return files
